@@ -1,0 +1,57 @@
+#| iCEBreaker-v1.0
+#|
+#| Implementation constraints file
+#| heavily based on @umarcor's iCESugar files
+
+#> Clock (12 MHz)
+set_io --warn-no-port iCEBreakerv10_CLK 35
+#set_frequency iCEBreakerv10_CLK 12
+
+#> LEDs
+set_io --warn-no-port iCEBreakerv10_LED_R_N 11
+set_io --warn-no-port iCEBreakerv10_LED_G_N 37
+
+#> On-board button
+set_io --warn-no-port iCEBreakerv10_BTN_N 10
+
+#> UART (Programmer & USB to Serial)
+set_io --warn-no-port iCEBreakerv10_RX 6
+set_io --warn-no-port iCEBreakerv10_TX 9
+
+#> PMOD 1A
+set_io --warn-no-port iCEBreakerv10_PMOD1A_1    4
+set_io --warn-no-port iCEBreakerv10_PMOD1A_2    2
+set_io --warn-no-port iCEBreakerv10_PMOD1A_3   47
+set_io --warn-no-port iCEBreakerv10_PMOD1A_4   45
+set_io --warn-no-port iCEBreakerv10_PMOD1A_7    3
+set_io --warn-no-port iCEBreakerv10_PMOD1A_8   48
+set_io --warn-no-port iCEBreakerv10_PMOD1A_9   46
+set_io --warn-no-port iCEBreakerv10_PMOD1A_10  44
+
+#> PMOD 1B
+set_io --warn-no-port iCEBreakerv10_PMOD1B_1   43
+set_io --warn-no-port iCEBreakerv10_PMOD1B_2   38
+set_io --warn-no-port iCEBreakerv10_PMOD1B_3   34
+set_io --warn-no-port iCEBreakerv10_PMOD1B_4   31
+set_io --warn-no-port iCEBreakerv10_PMOD1B_7   42
+set_io --warn-no-port iCEBreakerv10_PMOD1B_8   36
+set_io --warn-no-port iCEBreakerv10_PMOD1B_9   32
+set_io --warn-no-port iCEBreakerv10_PMOD1B_10  28
+
+#> PMOD 2 (buttons and LEDs)
+set_io --warn-no-port iCEBreakerv10_PMOD2_1_LED_left    27
+set_io --warn-no-port iCEBreakerv10_PMOD2_2_LED_right   25
+set_io --warn-no-port iCEBreakerv10_PMOD2_3_LED_down    21
+set_io --warn-no-port iCEBreakerv10_PMOD2_4_Button_2    19
+set_io --warn-no-port iCEBreakerv10_PMOD2_7_LED_center  26
+set_io --warn-no-port iCEBreakerv10_PMOD2_8_LED_up      23
+set_io --warn-no-port iCEBreakerv10_PMOD2_9_Button_1    20
+set_io --warn-no-port iCEBreakerv10_PMOD2_10_Button_3   18
+
+#> SPI
+set_io --warn-no-port iCEBreakerv10_SPI_CS_N   16
+set_io --warn-no-port iCEBreakerv10_SPI_SCK    15
+set_io --warn-no-port iCEBreakerv10_SPI_MOSI   17
+set_io --warn-no-port iCEBreakerv10_SPI_MISO   14
+set_io --warn-no-port iCEBreakerv10_SPI_WP_N   12
+set_io --warn-no-port iCEBreakerv10_SPI_RST_N  13

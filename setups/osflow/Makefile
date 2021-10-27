@@ -10,7 +10,7 @@ OrangeCrab_REV ?= r02-25F
 UPduino_REV ?= v3
 
 #ifndef BOARD
-#$(error BOARD needs to be set to 'Fomu', 'iCESugar', 'UPDuino' or 'OrangeCrab' !)
+#$(error BOARD needs to be set to 'Fomu', 'iCESugar', 'iCEBreaker', 'UPDuino' or 'OrangeCrab' !)
 #endif
 
 run:
@@ -37,6 +37,12 @@ endif
 	$(MAKE) \
 	  BITSTREAM=neorv32_$(BOARD)_$(FOMU_REV)_$(DESIGN).bit \
 	  NEORV32_MEM_SRC="${IMEM_SRC} devices/ice40/neorv32_dmem.ice40up_spram.vhd" \
+	  run
+
+iCEBreaker:
+	$(MAKE) \
+	  BITSTREAM=neorv32_$(BOARD)_$(DESIGN).bit \
+	  NEORV32_MEM_SRC="devices/ice40/neorv32_imem.ice40up_spram.vhd devices/ice40/neorv32_dmem.ice40up_spram.vhd" \
 	  run
 
 iCESugar:
