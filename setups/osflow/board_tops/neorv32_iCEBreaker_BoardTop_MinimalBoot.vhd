@@ -118,7 +118,7 @@ begin
     DYNAMICDELAY    => x"00",
     LOCK            => pll_rstn,
     BYPASS          => '0',
-    RESETB          => '1',
+    RESETB          => iCEBreakerv10_BTN_N,
     LATCHINPUTVALUE => '0',
     SDO             => open,
     SDI             => '0',
