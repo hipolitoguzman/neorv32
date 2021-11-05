@@ -44,7 +44,7 @@ ifeq ($(BOARD),iCEBreaker)
 $(info Setting constraints and implementation args for BOARD iCEBreaker)
 
 CONSTRAINTS ?= $(PCF_PATH)/$(BOARD).pcf
-PNRFLAGS    ?= --up5k --package sg48 --ignore-loops --timing-allow-fail
+PNRFLAGS    ?= --up5k --package sg48 --freq 13 --ignore-loops
 IMPL        ?= neorv32_$(BOARD)_$(ID)
 
 endif
