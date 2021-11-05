@@ -128,9 +128,17 @@ begin
   -- The core of the problem ----------------------------------------------------------------
   -- -------------------------------------------------------------------------------------------
 
+  -- This instance just sets the generics we want to have non-default values
+  -- The default values for the rest of the generics can be seen in the vhdl file that
+  -- describes the entity we are instancing here:
   neorv32_inst: entity work.neorv32_ProcessorTop_MinimalBoot
   generic map (
-    CLOCK_FREQUENCY => f_clock_c  -- clock frequency of clk_i in Hz
+    CLOCK_FREQUENCY => f_clock_c,  -- clock frequency of clk_i in Hz
+
+    -- If changing MEM_INT_DMEM_SIZE, the linker script in sw/common/neorv32.ld
+    -- must be modified to account for the different ram size, specifically this line:
+    --   ram  (rwx) : ORIGIN = 0x80000000, LENGTH = DEFINED(make_bootloader) ? 512 : 8*1024
+    MEM_INT_DMEM_SIZE => 8*1024 -- size of processor-internal data memory in bytes
   )
   port map (
     -- Global control --
