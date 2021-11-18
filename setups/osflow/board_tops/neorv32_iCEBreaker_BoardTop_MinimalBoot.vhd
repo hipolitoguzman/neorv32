@@ -1,5 +1,5 @@
 -- #################################################################################################
--- # << NEORV32 - Example setup including the bootloader, for the iCEBreaker (c) Board >>            #
+-- # << NEORV32 - Example setup including the bootloader, for the iCEBreaker (c) Board >>          #
 -- # ********************************************************************************************* #
 -- # BSD 3-Clause License                                                                          #
 -- #                                                                                               #
@@ -32,110 +32,256 @@
 -- # The NEORV32 Processor - https://github.com/stnolting/neorv32              (c) Stephan Nolting #
 -- #################################################################################################
 
+-- Created by Hipolito Guzman-Miranda based on Unai Martinez-Corral's adaptation to the iCESugar board
+
+-- Allow use of std_logic, signed, unsigned
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library iCE40;
-use iCE40.components.all; -- for device primitives and macros
+-- Library where the processor is located
+library neorv32;
 
 entity neorv32_iCEBreaker_BoardTop_MinimalBoot is
   -- Top-level ports. Board pins are defined in setups/osflow/constraints/iCEBreaker.pcf
   port (
     -- 12MHz Clock input
-    iCEBreakerv10_CLK : in std_logic;
+    iCEBreakerv10_CLK                : in std_logic;
     -- UART0
-    iCEBreakerv10_RX : in  std_logic;
-    iCEBreakerv10_TX : out std_logic;
+    iCEBreakerv10_RX                 : in  std_logic;
+    iCEBreakerv10_TX                 : out std_logic;
     -- Button inputs
-    iCEBreakerv10_BTN_N: in std_logic;
-    iCEBreakerv10_PMOD2_9_Button_1: in std_logic;
-    iCEBreakerv10_PMOD2_10_Button_3: in std_logic;
+    iCEBreakerv10_BTN_N              : in std_logic;
+    iCEBreakerv10_PMOD2_9_Button_1   : in std_logic;
+    iCEBreakerv10_PMOD2_10_Button_3  : in std_logic;
     -- LED outputs
-    iCEBreakerv10_LED_R_N : out std_logic;
-    iCEBreakerv10_LED_G_N : out std_logic;
-    iCEBreakerv10_PMOD2_7_LED_center : out std_logic;
-    iCEBreakerv10_PMOD2_8_LED_up: out std_logic;
-    iCEBreakerv10_PMOD2_3_LED_down: out std_logic;
-    iCEBreakerv10_PMOD2_2_LED_right: out std_logic
+    iCEBreakerv10_LED_R_N            : out std_logic;
+    iCEBreakerv10_LED_G_N            : out std_logic;
+    iCEBreakerv10_PMOD2_1_LED_left   : out std_logic;
+    iCEBreakerv10_PMOD2_2_LED_right  : out std_logic;
+    iCEBreakerv10_PMOD2_8_LED_up     : out std_logic;
+    iCEBreakerv10_PMOD2_3_LED_down   : out std_logic;
+    iCEBreakerv10_PMOD2_7_LED_center : out std_logic
   );
 end entity;
 
 architecture neorv32_iCEBreaker_BoardTop_MinimalBoot_rtl of neorv32_iCEBreaker_BoardTop_MinimalBoot is
 
-  -- configuration --
-  constant f_clock_c : natural := 12_000_000; -- Microprocessor clock frequency (Hz)
+  -- -------------------------------------------------------------------------------------------
+  -- Constants for microprocessor configuration
+  -- -------------------------------------------------------------------------------------------
 
-  -- internal IO connection --
-  signal con_gpio_o : std_ulogic_vector(3 downto 0);
-  signal con_pwm  : std_logic_vector(2 downto 0);
+  -- General config --
+  constant CLOCK_FREQUENCY              : natural := 12_000_000;  -- Microprocessor clock frequency (Hz)
+  constant INT_BOOTLOADER_EN            : boolean := true;        -- boot configuration: true = boot explicit bootloader; false = boot from int/ext (I)MEM
+  constant HW_THREAD_ID                 : natural := 0;           -- hardware thread id (32-bit)
+
+  -- RISC-V CPU Extensions --
+  constant CPU_EXTENSION_RISCV_A        : boolean := true;        -- implement atomic extension?
+  constant CPU_EXTENSION_RISCV_C        : boolean := true;        -- implement compressed extension?
+  constant CPU_EXTENSION_RISCV_E        : boolean := false;       -- implement embedded RF extension?
+  constant CPU_EXTENSION_RISCV_M        : boolean := true;        -- implement mul/div extension?
+  constant CPU_EXTENSION_RISCV_U        : boolean := false;       -- implement user mode extension?
+  constant CPU_EXTENSION_RISCV_Zfinx    : boolean := false;       -- implement 32-bit floating-point extension (using INT regs!)
+  constant CPU_EXTENSION_RISCV_Zicsr    : boolean := true;        -- implement CSR system?
+  constant CPU_EXTENSION_RISCV_Zifencei : boolean := false;       -- implement instruction stream sync.?
+
+  -- Extension Options --
+  constant FAST_MUL_EN                  : boolean := false;       -- use DSPs for M extension's multiplier
+  constant FAST_SHIFT_EN                : boolean := false;       -- use barrel shifter for shift operations
+  constant CPU_CNT_WIDTH                : natural := 34;          -- total width of CPU cycle and instret counters (0..64)
+
+  -- Physical Memory Protection (PMP) --
+  constant PMP_NUM_REGIONS              : natural := 0;            -- number of regions (0..64)
+  constant PMP_MIN_GRANULARITY          : natural := 64*1024;      -- minimal region granularity in bytes, has to be a power of 2, min 8 bytes
+
+  -- Hardware Performance Monitors (HPM) --
+  constant HPM_NUM_CNTS                 : natural := 0;            -- number of implemented HPM counters (0..29)
+  constant HPM_CNT_WIDTH                : natural := 40;           -- total size of HPM counters (0..64)
+
+  -- Internal Instruction memory --
+  constant MEM_INT_IMEM_EN              : boolean := true;         -- implement processor-internal instruction memory
+  constant MEM_INT_IMEM_SIZE            : natural := 64*1024;      -- size of processor-internal instruction memory in bytes
+
+  -- Internal Data memory --
+  constant MEM_INT_DMEM_EN              : boolean := true;         -- implement processor-internal data memory
+  constant MEM_INT_DMEM_SIZE            : natural := 8*1024;      -- size of processor-internal data memory in bytes
+
+  -- Internal Cache memory --
+  constant ICACHE_EN                    : boolean := false;       -- implement instruction cache
+  constant ICACHE_NUM_BLOCKS            : natural := 4;           -- i-cache: number of blocks (min 1), has to be a power of 2
+  constant ICACHE_BLOCK_SIZE            : natural := 64;          -- i-cache: block size in bytes (min 4), has to be a power of 2
+  constant ICACHE_ASSOCIATIVITY         : natural := 1;           -- i-cache: associativity / number of sets (1=direct_mapped), has to be a power of 2
+
+  -- Processor peripherals --
+  constant IO_GPIO_EN                   : boolean := true;        -- implement general purpose input/output port unit (GPIO)?
+  constant IO_MTIME_EN                  : boolean := true;        -- implement machine system timer (MTIME)?
+  constant IO_UART0_EN                  : boolean := true;        -- implement primary universal asynchronous receiver/transmitter (UART0)?
+  constant IO_PWM_NUM_CH                : natural := 3;           -- number of PWM channels to implement (0..60); 0 = disabled
+  constant IO_WDT_EN                    : boolean := true;        -- implement watch dog timer (WDT)?
+
+  -- -------------------------------------------------------------------------------------------
+  -- Signals for internal IO connections
+  -- -------------------------------------------------------------------------------------------
+  signal gpio_o : std_ulogic_vector(63 downto 0);
 
 begin
 
+  -- -------------------------------------------------------------------------------------------
   -- Instance the microprocessor
   -- -------------------------------------------------------------------------------------------
 
-  -- This instance just sets the generics we want to have non-default values
-  -- The default values for the rest of the generics can be seen in the vhdl file that
-  -- describes the entity we are instancing here
-  -- neorv32_ProcessorTop_MinimalBoot is an entity defined in
-  -- rtl/processor_templates/neorv32_ProcessorTop_MinimalBoot.vhd 
-  neorv32_inst: entity work.neorv32_ProcessorTop_MinimalBoot
+  neorv32_inst: entity neorv32.neorv32_top
   generic map (
-    CLOCK_FREQUENCY => f_clock_c,  -- clock frequency of clk_i in Hz
+    -- General --
+    CLOCK_FREQUENCY              => CLOCK_FREQUENCY,               -- clock frequency of clk_i in Hz
+    INT_BOOTLOADER_EN            => INT_BOOTLOADER_EN,             -- boot configuration: true = boot explicit bootloader; false = boot from int/ext (I)MEM
+    HW_THREAD_ID                 => HW_THREAD_ID,                  -- hardware thread id (32-bit)
 
-    -- If changing MEM_INT_DMEM_SIZE, the linker script in sw/common/neorv32.ld
-    -- must be modified to account for the different ram size, specifically this line:
-    --   ram  (rwx) : ORIGIN = 0x80000000, LENGTH = DEFINED(make_bootloader) ? 512 : 8*1024
-    MEM_INT_DMEM_SIZE => 8*1024 -- size of processor-internal data memory in bytes
+    -- On-Chip Debugger (OCD) --
+    ON_CHIP_DEBUGGER_EN          => false,                         -- implement on-chip debugger?
+
+    -- RISC-V CPU Extensions --
+    CPU_EXTENSION_RISCV_A        => CPU_EXTENSION_RISCV_A,         -- implement atomic extension?
+    CPU_EXTENSION_RISCV_C        => CPU_EXTENSION_RISCV_C,         -- implement compressed extension?
+    CPU_EXTENSION_RISCV_E        => CPU_EXTENSION_RISCV_E,         -- implement embedded RF extension?
+    CPU_EXTENSION_RISCV_M        => CPU_EXTENSION_RISCV_M,         -- implement mul/div extension?
+    CPU_EXTENSION_RISCV_U        => CPU_EXTENSION_RISCV_U,         -- implement user mode extension?
+    CPU_EXTENSION_RISCV_Zfinx    => CPU_EXTENSION_RISCV_Zfinx,     -- implement 32-bit floating-point extension (using INT regs!)
+    CPU_EXTENSION_RISCV_Zicsr    => CPU_EXTENSION_RISCV_Zicsr,     -- implement CSR system?
+    CPU_EXTENSION_RISCV_Zicntr   => true,                          -- implement base counters?
+    CPU_EXTENSION_RISCV_Zifencei => CPU_EXTENSION_RISCV_Zifencei,  -- implement instruction stream sync.?
+
+    -- Extension Options --
+    FAST_MUL_EN                  => FAST_MUL_EN,                   -- use DSPs for M extension's multiplier
+    FAST_SHIFT_EN                => FAST_SHIFT_EN,                 -- use barrel shifter for shift operations
+    CPU_CNT_WIDTH                => CPU_CNT_WIDTH,                 -- total width of CPU cycle and instret counters (0..64)
+
+    -- Physical Memory Protection (PMP) --
+    PMP_NUM_REGIONS              => PMP_NUM_REGIONS,       -- number of regions (0..64)
+    PMP_MIN_GRANULARITY          => PMP_MIN_GRANULARITY,   -- minimal region granularity in bytes, has to be a power of 2, min 8 bytes
+
+    -- Hardware Performance Monitors (HPM) --
+    HPM_NUM_CNTS                 => HPM_NUM_CNTS,          -- number of implemented HPM counters (0..29)
+    HPM_CNT_WIDTH                => HPM_CNT_WIDTH,         -- total size of HPM counters (1..64)
+
+    -- Internal Instruction memory --
+    MEM_INT_IMEM_EN              => MEM_INT_IMEM_EN,       -- implement processor-internal instruction memory
+    MEM_INT_IMEM_SIZE            => MEM_INT_IMEM_SIZE,     -- size of processor-internal instruction memory in bytes
+
+    -- Internal Data memory --
+    MEM_INT_DMEM_EN              => MEM_INT_DMEM_EN,       -- implement processor-internal data memory
+    MEM_INT_DMEM_SIZE            => MEM_INT_DMEM_SIZE,     -- size of processor-internal data memory in bytes
+
+    -- Internal Cache memory --
+    ICACHE_EN                    => ICACHE_EN,             -- implement instruction cache
+    ICACHE_NUM_BLOCKS            => ICACHE_NUM_BLOCKS,     -- i-cache: number of blocks (min 1), has to be a power of 2
+    ICACHE_BLOCK_SIZE            => ICACHE_BLOCK_SIZE,     -- i-cache: block size in bytes (min 4), has to be a power of 2
+    ICACHE_ASSOCIATIVITY         => ICACHE_ASSOCIATIVITY,  -- i-cache: associativity / number of sets (1=direct_mapped), has to be a power of 2
+
+    -- External memory interface --
+    MEM_EXT_EN                   => false,                 -- implement external memory bus interface?
+    MEM_EXT_TIMEOUT              => 0,                     -- cycles after a pending bus access auto-terminates (0 = disabled)
+
+    -- Processor peripherals --
+    IO_GPIO_EN                   => IO_GPIO_EN,    -- implement general purpose input/output port unit (GPIO)?
+    IO_MTIME_EN                  => IO_MTIME_EN,   -- implement machine system timer (MTIME)?
+    IO_UART0_EN                  => IO_UART0_EN,   -- implement primary universal asynchronous receiver/transmitter (UART0)?
+    IO_UART1_EN                  => false,         -- implement secondary universal asynchronous receiver/transmitter (UART1)?
+    IO_SPI_EN                    => false,         -- implement serial peripheral interface (SPI)?
+    IO_TWI_EN                    => false,         -- implement two-wire interface (TWI)?
+    IO_PWM_NUM_CH                => IO_PWM_NUM_CH, -- number of PWM channels to implement (0..60); 0 = disabled
+    IO_WDT_EN                    => IO_WDT_EN,     -- implement watch dog timer (WDT)?
+    IO_TRNG_EN                   => false,         -- implement true random number generator (TRNG)?
+    IO_CFS_EN                    => false,         -- implement custom functions subsystem (CFS)?
+    IO_CFS_CONFIG                => x"00000000",   -- custom CFS configuration generic
+    IO_CFS_IN_SIZE               => 32,            -- size of CFS input conduit in bits
+    IO_CFS_OUT_SIZE              => 32,            -- size of CFS output conduit in bits
+    IO_NEOLED_EN                 => false          -- implement NeoPixel-compatible smart LED interface (NEOLED)?
   )
   port map (
     -- Global control --
-    clk_i      => std_ulogic(iCEBreakerv10_CLK), --std_ulogic(pll_clk),
-    rstn_i     => std_ulogic(iCEBreakerv10_BTN_N), --std_ulogic(pll_rstn),
+    clk_i       => std_ulogic(iCEBreakerv10_CLK),   -- global clock, rising edge
+    rstn_i      => std_ulogic(iCEBreakerv10_BTN_N), -- global reset, low-active, async
 
-    -- GPIO --
-    gpio_o     => con_gpio_o,
+    -- JTAG on-chip debugger interface (available if ON_CHIP_DEBUGGER_EN = true) --
+    jtag_trst_i => '0',                          -- low-active TAP reset (optional)
+    jtag_tck_i  => '0',                          -- serial clock
+    jtag_tdi_i  => '0',                          -- serial data input
+    jtag_tdo_o  => open,                         -- serial data output
+    jtag_tms_i  => '0',                          -- mode select
 
-    -- primary UART --
-    uart_txd_o => iCEBreakerv10_TX, -- UART0 send data
-    uart_rxd_i => iCEBreakerv10_RX, -- UART0 receive data
-    uart_rts_o => open, -- hw flow control: UART0.RX ready to receive ("RTR"), low-active, optional
-    uart_cts_i => '0',  -- hw flow control: UART0.TX allowed to transmit, low-active, optional
+    -- Wishbone bus interface (available if MEM_EXT_EN = true) --
+    wb_tag_o    => open,                         -- request tag
+    wb_adr_o    => open,                         -- address
+    wb_dat_i    => (others => '0'),              -- read data
+    wb_dat_o    => open,                         -- write data
+    wb_we_o     => open,                         -- read/write
+    wb_sel_o    => open,                         -- byte enable
+    wb_stb_o    => open,                         -- strobe
+    wb_cyc_o    => open,                         -- valid cycle
+    wb_lock_o   => open,                         -- exclusive access request
+    wb_ack_i    => '0',                          -- transfer acknowledge
+    wb_err_i    => '0',                          -- transfer error
 
-    -- PWM (to on-board RGB LED) --
-    pwm_o      => con_pwm
+    -- Advanced memory control signals (available if MEM_EXT_EN = true) --
+    fence_o     => open,                         -- indicates an executed FENCE operation
+    fencei_o    => open,                         -- indicates an executed FENCEI operation
+
+    -- GPIO (available if IO_GPIO_EN = true) --
+    gpio_o      => gpio_o,                       -- parallel output
+    gpio_i      => (others => '0'),              -- parallel input
+
+    -- primary UART0 (available if IO_UART0_EN = true) --
+    uart0_txd_o => iCEBreakerv10_TX,             -- UART0 send data
+    uart0_rxd_i => iCEBreakerv10_RX,             -- UART0 receive data
+    uart0_rts_o => open,                         -- hw flow control: UART0.RX ready to receive ("RTR"), low-active, optional
+    uart0_cts_i => '0',                          -- hw flow control: UART0.TX allowed to transmit, low-active, optional
+
+    -- secondary UART1 (available if IO_UART1_EN = true) --
+    uart1_txd_o => open,                         -- UART1 send data
+    uart1_rxd_i => '0',                          -- UART1 receive data
+    uart1_rts_o => open,                         -- hw flow control: UART1.RX ready to receive ("RTR"), low-active, optional
+    uart1_cts_i => '0',                          -- hw flow control: UART1.TX allowed to transmit, low-active, optional
+
+    -- SPI (available if IO_SPI_EN = true) --
+    spi_sck_o   => open,                         -- SPI serial clock
+    spi_sdo_o   => open,                         -- controller data out, peripheral data in
+    spi_sdi_i   => '0',                          -- controller data in, peripheral data out
+    spi_csn_o   => open,                         -- SPI CS
+
+    -- TWI (available if IO_TWI_EN = true) --
+    twi_sda_io  => open,                         -- twi serial data line
+    twi_scl_io  => open,                         -- twi serial clock line
+
+    -- PWM (available if IO_PWM_NUM_CH > 0) --
+    pwm_o       => open,                         -- pwm channels
+
+    -- Custom Functions Subsystem IO --
+    cfs_in_i    => (others => '0'),              -- custom CFS inputs conduit
+    cfs_out_o   => open,                         -- custom CFS outputs conduit
+
+    -- NeoPixel-compatible smart LED interface (available if IO_NEOLED_EN = true) --
+    neoled_o    => open,                         -- async serial data line
+
+    -- System time --
+    mtime_i     => (others => '0'),              -- current system time from ext. MTIME (if IO_MTIME_EN = false)
+    mtime_o     => open,                         -- current system time from int. MTIME (if IO_MTIME_EN = true)
+
+    -- Interrupts --
+    mtime_irq_i => '0',                          -- machine timer interrupt, available if IO_MTIME_EN = false
+    msw_irq_i   => '0',                          -- machine software interrupt
+    mext_irq_i  => '0'                           -- machine external interrupt
   );
 
-  -- IO Connection --------------------------------------------------------------------------
+  -- -------------------------------------------------------------------------------------------
+  -- IO Connections
   -- -------------------------------------------------------------------------------------------
 
-  -- This is a hard IP that can drive leds and includes some PWMs
-
-  RGB_inst: SB_RGBA_DRV
-  generic map (
-    CURRENT_MODE => "0b1",
-    RGB0_CURRENT => "0b000011",
-    RGB1_CURRENT => "0b000011",
-    RGB2_CURRENT => "0b000011"
-  )
-  port map (
-    CURREN   => '1',  -- I
-    RGBLEDEN => '1',  -- I
-    RGB2PWM  => con_pwm(2),                   -- I - blue  - pwm channel 2
-    RGB1PWM  => con_pwm(1) or con_gpio_o(0),  -- I - red   - pwm channel 1 || BOOT blink
-    RGB0PWM  => con_pwm(0),                   -- I - green - pwm channel 0
-    RGB2     => iCEBreakerv10_PMOD2_7_LED_center,  -- O - center led in PMOD2
-    RGB1     => iCEBreakerv10_LED_R_N,            -- O - red
-    RGB0     => iCEBreakerv10_LED_G_N             -- O - green
-  );
-
-  -- Connect some buttons to LEDs so we know our bitstream is ok
-  --iCEBreakerv10_PMOD2_8_LED_up <= NOT iCEBreakerv10_PMOD2_9_Button_1;
-  --iCEBreakerv10_PMOD2_3_LED_down <= NOT iCEBreakerv10_PMOD2_10_Button_3;
-
-  iCEBreakerv10_PMOD2_8_LED_up <= con_gpio_o(1);
-  iCEBreakerv10_PMOD2_3_LED_down <= con_gpio_o(2);
-  iCEBreakerv10_PMOD2_2_LED_right <= con_gpio_o(3);
+  iCEBreakerv10_PMOD2_1_LED_left   <= gpio_o(0);
+  iCEBreakerv10_PMOD2_2_LED_right  <= gpio_o(1);
+  iCEBreakerv10_PMOD2_8_LED_up     <= gpio_o(2);
+  iCEBreakerv10_PMOD2_3_LED_down   <= gpio_o(3);
+  iCEBreakerv10_PMOD2_7_LED_center <= gpio_o(4);
 
 end architecture;
