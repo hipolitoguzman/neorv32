@@ -151,7 +151,7 @@ second text file `neorv32.uart0.sim_mode.data.out` also located in the simulatio
 
 [TIP]
 More information regarding the simulation-mode of the UART0 can be found in the User Guide
-section https://stnolting.github.io/neorv32/ug/#_simulating_the_processor[Simulating the Processor].
+section https://hipolitoguzman.github.io/neorv32/ug/#_simulating_the_processor[Simulating the Processor].
 
 
 .UART0 register map (`struct NEORV32_UART0`)

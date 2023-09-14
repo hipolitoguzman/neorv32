@@ -1,6 +1,6 @@
 # :copyright:
 
-Figures are own work if not otherwise stated. License: https://github.com/stnolting/neorv32/blob/master/LICENSE
+Figures are own work if not otherwise stated. License: https://github.com/hipolitoguzman/neorv32/blob/master/LICENSE
 
 ## `SPI_timing_diagram2.wikimedia.png`
 

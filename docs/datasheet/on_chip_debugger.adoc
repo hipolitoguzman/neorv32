@@ -31,7 +31,7 @@ on area, energy or timing at all).
 
 [TIP]
 A simple example on how to use NEORV32 on-chip debugger in combination with `OpenOCD` and `gdb`
-is shown in section https://stnolting.github.io/neorv32/ug/#_debugging_using_the_on_chip_debugger[Debugging using the On-Chip Debugger]
+is shown in section https://hipolitoguzman.github.io/neorv32/ug/#_debugging_using_the_on_chip_debugger[Debugging using the On-Chip Debugger]
 of the User Guide.
 
 The NEORV32 on-chip debugger complex is based on three hardware modules:

@@ -20,12 +20,12 @@ header:
     left:
       content: '*The NEORV32 Processor*'
     right:
-      content: '*Visit on https://github.com/stnolting/neorv32[GitHub]*'
+      content: '*Visit on https://github.com/hipolitoguzman/neorv32[GitHub]*'
   verso:
     left:
       content: '*The NEORV32 Processor*'
     right:
-      content: '*Visit on https://github.com/stnolting/neorv32[GitHub]*'
+      content: '*Visit on https://github.com/hipolitoguzman/neorv32[GitHub]*'
 footer:
   start-at: toc
   height: 0.75in

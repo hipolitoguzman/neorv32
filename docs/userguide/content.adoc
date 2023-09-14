@@ -120,7 +120,7 @@ If you want to use a more sophisticated pre-defined setup to start with, check o
 `setups` folder, which provides example setups for various FPGA, boards and toolchains.
 
 The NEORV32 project features two minimalistic pre-configured test setups in
-https://github.com/stnolting/neorv32/blob/master/rtl/test_setups[`rtl/test_setups`].
+https://github.com/hipolitoguzman/neorv32/blob/master/rtl/test_setups[`rtl/test_setups`].
 Both test setups only implement very basic processor and CPU features.
 The main difference between the two setups is the processor boot concept - so how to get a software executable
 _into_ the processor:
@@ -306,7 +306,7 @@ The "`512`" are not relevant for the application.
 
 .Advanced: Section base address and size
 [IMPORTANT]
-More information can be found in the datasheet section https://stnolting.github.io/neorv32/#_address_space[Address Space].
+More information can be found in the datasheet section https://hipolitoguzman.github.io/neorv32/#_address_space[Address Space].
 
 
 
@@ -371,7 +371,7 @@ Follow this guide to use the bootloader to upload an executable via UART.
 
 [NOTE]
 This concept uses the default "Indirect Boot" scenario that uses the bootloader to upload new executables.
-See datasheet section https://stnolting.github.io/neorv32/#_indirect_boot[Indirect Boot] for more information.
+See datasheet section https://hipolitoguzman.github.io/neorv32/#_indirect_boot[Indirect Boot] for more information.
 
 [IMPORTANT]
 If your FPGA board does not provide such an interface - don't worry!
@@ -472,7 +472,7 @@ Blinking LED demo program
 
 [NOTE]
 The bootloader will print error codes if something went wrong.
-See section https://stnolting.github.io/neorv32/#_bootloader[Bootloader] of the NEORV32 datasheet for more information.
+See section https://hipolitoguzman.github.io/neorv32/#_bootloader[Bootloader] of the NEORV32 datasheet for more information.
 
 [TIP]
 See section <<_programming_an_external_spi_flash_via_the_bootloader>> to learn how to use an external SPI
@@ -498,7 +498,7 @@ executable inside the processor. This storage cannot be altered during runtime a
 the application requires to re-program the FPGA via the bitstream.
 
 [TIP]
-See datasheet section https://stnolting.github.io/neorv32/#_direct_boot[Direct Boot] for more information.
+See datasheet section https://hipolitoguzman.github.io/neorv32/#_direct_boot[Direct Boot] for more information.
 
 
 
@@ -772,21 +772,21 @@ The processor provides several predefined options to add application-specific cu
 
 The processor already provides a set of standard interfaces that are intended to connect _chip-external_ devices.
 However, these interfaces can also be used chip-internally. The most suitable interfaces are
-https://stnolting.github.io/neorv32/#_general_purpose_input_and_output_port_gpio[GPIO],
-https://stnolting.github.io/neorv32/#_primary_universal_asynchronous_receiver_and_transmitter_uart0[UART],
-https://stnolting.github.io/neorv32/#_serial_peripheral_interface_controller_spi[SPI] and
-https://stnolting.github.io/neorv32/#_two_wire_serial_interface_controller_twi[TWI].
+https://hipolitoguzman.github.io/neorv32/#_general_purpose_input_and_output_port_gpio[GPIO],
+https://hipolitoguzman.github.io/neorv32/#_primary_universal_asynchronous_receiver_and_transmitter_uart0[UART],
+https://hipolitoguzman.github.io/neorv32/#_serial_peripheral_interface_controller_spi[SPI] and
+https://hipolitoguzman.github.io/neorv32/#_two_wire_serial_interface_controller_twi[TWI].
 
 The SPI and (especially) the GPIO interfaces might be the most straightforward approaches since they
 have a minimal  protocol overhead. Device-specific interrupt capabilities can be added using the
-https://stnolting.github.io/neorv32/#_external_interrupt_controller_xirq[External Interrupt Controller (XIRQ)].
+https://hipolitoguzman.github.io/neorv32/#_external_interrupt_controller_xirq[External Interrupt Controller (XIRQ)].
 Beyond simplicity, these interface only provide a very limited bandwidth and require more sophisticated
 software handling ("bit-banging" for the GPIO).
 
 
 === External Bus Interface
 
-The https://stnolting.github.io/neorv32/#_processor_external_memory_interface_wishbone_axi4_lite[External Bus Interface]
+The https://hipolitoguzman.github.io/neorv32/#_processor_external_memory_interface_wishbone_axi4_lite[External Bus Interface]
 provides the classic approach to connect to custom IP. By default, the bus interface implements the widely adopted
 Wishbone interface standard. However, this project also includes wrappers to bridge to other protocol standards like ARM's
 AXI4-Lite or Intel's Avalon. By using a full-featured bus protocol, complex SoC structures can be implemented (including
@@ -797,13 +797,13 @@ whole SoC architectures and even include pre-defined IP libraries.
 image::neorv32_axi_soc.png[]
 
 The bus interface uses a memory-mapped approach. All data transfers are handled by simple load/store operations since the
-external bus interface is mapped into the processor's https://stnolting.github.io/neorv32/#_address_space[address space].
+external bus interface is mapped into the processor's https://hipolitoguzman.github.io/neorv32/#_address_space[address space].
 This allows a very simple still high-bandwidth communications.
 
 
 === Stream Link Interface
 
-The NEORV32 https://stnolting.github.io/neorv32/#_stream_link_interface_slink[Stream Link Interface] provides
+The NEORV32 https://hipolitoguzman.github.io/neorv32/#_stream_link_interface_slink[Stream Link Interface] provides
 point-to-point, unidirectional and parallel data channels that can be used to transfer streaming data. In
 contrast to the external bus interface, the streaming data does not provide any kind of "direction" control,
 so it can be seen as "constant address bursts". The stream link interface provides less protocol overhead
@@ -813,7 +813,7 @@ allow more CPU-independent operation.
 
 === Custom Functions Subsystem
 
-The NEORV32 https://stnolting.github.io/neorv32/#_custom_functions_subsystem_cfs[Custom Functions Subsystem] is
+The NEORV32 https://hipolitoguzman.github.io/neorv32/#_custom_functions_subsystem_cfs[Custom Functions Subsystem] is
 an "empty" template for a processor-internal module. It provides 32 32-bit memory-mapped interface
 registers that can be used to communicate with any arbitrary custom design logic. The intentions of this
 subsystem is to provide a simple base, where the user can concentrate on implementing the actual design logic
@@ -1042,7 +1042,7 @@ Set the synthesis option "global" when generating the block design to maintain t
 
 [NOTE]
 Guide provided by GitHub user https://github.com/AWenzel83[`AWenzel83`] (see
-https://github.com/stnolting/neorv32/discussions/52#discussioncomment-819013). ❤️
+https://github.com/hipolitoguzman/neorv32/discussions/52#discussioncomment-819013). ❤️
 
 
 
@@ -1124,7 +1124,7 @@ see section <<_faster_simulation_console_output>>.
 
 When printing data via the UART the communication speed will always be based on the configured BAUD
 rate. For a simulation this might take some time. To have faster output you can enable the **simulation mode**
-for UART0/UART1 (see section https://stnolting.github.io/neorv32/#_primary_universal_asynchronous_receiver_and_transmitter_uart0[Documentation: Primary Universal Asynchronous Receiver and Transmitter (UART0)]).
+for UART0/UART1 (see section https://hipolitoguzman.github.io/neorv32/#_primary_universal_asynchronous_receiver_and_transmitter_uart0[Documentation: Primary Universal Asynchronous Receiver and Transmitter (UART0)]).
 
 ASCII data sent to UART0|UART1 will be immediately printed to the simulator console and logged to files in the simulator
 execution directory:
@@ -1288,8 +1288,8 @@ A makefiles in the project's `docs` directory is provided to build all of the do
 or as PDF documents.
 
 [TIP]
-Pre-rendered PDFs are available online as _nightly pre-releases_: https://github.com/stnolting/neorv32/releases.
-The HTML-based documentation is also available online at the project's https://stnolting.github.io/neorv32/[GitHub Pages].
+Pre-rendered PDFs are available online as _nightly pre-releases_: https://github.com/hipolitoguzman/neorv32/releases.
+The HTML-based documentation is also available online at the project's https://hipolitoguzman.github.io/neorv32/[GitHub Pages].
 
 The makefile provides a help target to show all available build options and their according outputs.
 
@@ -1323,7 +1323,7 @@ so the Zephyr build system can generate executables and memory-initialization im
 
 [NOTE]
 Zephyr OS port provided by GitHub user https://github.com/henrikbrixandersen[henrikbrixandersen]
-(see https://github.com/stnolting/neorv32/discussions/172). ❤️
+(see https://github.com/hipolitoguzman/neorv32/discussions/172). ❤️
 
 
 
@@ -1348,7 +1348,7 @@ The NEORV32 Processor passes the according tests provided by the official RISC-V
 All files required for executing the test framework on a simulated instance of the processor (including port
 files) are located in the `sw/isa-test` folder of the NEORV32 repository. The test framework is executed via the
 `sim/run_riscv_arch_test.sh` script. Take a look at the provided `sim/README.md`
-(https://github.com/stnolting/neorv32/tree/master/sim[online at GitHub])
+(https://github.com/hipolitoguzman/neorv32/tree/master/sim[online at GitHub])
 file for more information on how to run the tests and how testing is conducted in detail.
 
 
@@ -1363,7 +1363,7 @@ host machine. The general flow is independent of the host machine's operating sy
 Windows and Linux (Ubuntu on Windows) in parallel.
 
 [TIP]
-See datasheet section https://stnolting.github.io/neorv32/#_on_chip_debugger_ocd[On Chip Debugger (OCD)]
+See datasheet section https://hipolitoguzman.github.io/neorv32/#_on_chip_debugger_ocd[On Chip Debugger (OCD)]
 for more information.
 
 [NOTE]
@@ -1414,7 +1414,7 @@ according to your interface chip and your operating system.
 
 [TIP]
 If you want to modify the JTAG clock speed (via `adapter speed` in `sw/openocd/openocd_neorv32.cfg`) make sure to meet
-the clock requirements noted in https://stnolting.github.io/neorv32/#_debug_module_dm[Documentation: Debug Transport Module (DTM)].
+the clock requirements noted in https://hipolitoguzman.github.io/neorv32/#_debug_module_dm[Documentation: Debug Transport Module (DTM)].
 
 To access the processor using OpenOCD, open a terminal and start OpenOCD with the pre-configured configuration file.
 

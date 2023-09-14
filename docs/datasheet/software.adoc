@@ -34,7 +34,7 @@ The default toolchain prefix used by the project's makefiles is (can be changed 
 
 [TIP]
 More information regarding the toolchain (building from scratch or downloading the prebuilt ones)
-can be found in the user guides' section https://stnolting.github.io/neorv32/ug/#_software_toolchain_setup[Software Toolchain Setup].
+can be found in the user guides' section https://hipolitoguzman.github.io/neorv32/ug/#_software_toolchain_setup[Software Toolchain Setup].
 
 
 
@@ -83,7 +83,7 @@ files are currently part of the NEORV32 core library:
 .Documentation
 [TIP]
 All core library software sources are highly documented using _doxygen_. See section <<Building the Software Framework Documentation>>.
-The documentation is automatically built and deployed to GitHub pages by the CI workflow (:https://stnolting.github.io/neorv32/sw/files.html).
+The documentation is automatically built and deployed to GitHub pages by the CI workflow (:https://hipolitoguzman.github.io/neorv32/sw/files.html).
 
 
 
@@ -102,7 +102,7 @@ when your project is located somewhere else.
 [NOTE]
 Before you can use the makefiles, you need to install the RISC-V GCC toolchain. Also, you have to add the
 installation folder of the compiler to your system's `PATH` variable. More information can be found in
-https://stnolting.github.io/neorv32/ug/#_software_toolchain_setup[User Guide: Software Toolchain Setup].
+https://hipolitoguzman.github.io/neorv32/ug/#_software_toolchain_setup[User Guide: Software Toolchain Setup].
 
 The makefile is invoked by simply executing make in your console:
 
@@ -184,7 +184,7 @@ NEORV32_HOME ?= ../../..
 | _ASM_INC_         | Include file folders that are used only for the assembly source files (`*.S`/`*.s`).
 | _EFFORT_          | Optimization level, optimize for size (`-Os`) is default; legal values: `-O0`, `-O1`, `-O2`, `-O3`, `-Os`
 | _RISCV_PREFIX_    | The toolchain prefix to be used; follows the naming convention "architecture-vendor-output-"
-| _MARCH_           | The targeted RISC-V architecture/ISA. Only `rv32` is supported by the NEORV32. Enable compiler support of optional CPU extension by adding the according extension letter (e.g. `rv32im` for _M_ CPU extension). See https://stnolting.github.io/neorv32/ug/#_enabling_risc_v_cpu_extensions[User Guide: Enabling RISC-V CPU Extensions] for more information.
+| _MARCH_           | The targeted RISC-V architecture/ISA. Only `rv32` is supported by the NEORV32. Enable compiler support of optional CPU extension by adding the according extension letter (e.g. `rv32im` for _M_ CPU extension). See https://hipolitoguzman.github.io/neorv32/ug/#_enabling_risc_v_cpu_extensions[User Guide: Enabling RISC-V CPU Extensions] for more information.
 | _MABI_            | The default 32-bit integer ABI.
 | _USER_FLAGS_      | Additional flags that will be forwarded to the compiler tools
 | _NEORV32_HOME_    | Relative or absolute path to the NEORV32 project home folder. Adapt this if the makefile/project is not in the project's `sw/example folder`.
@@ -393,7 +393,7 @@ int __neorv32_crt0_after_main(int32_t return_code) {
 [NOTE]
 This section illustrated the **default** bootloader from the repository. The bootloader can be customized
 to target application-specific scenarios. See User Guide section
-https://stnolting.github.io/neorv32/ug/#_customizing_the_internal_bootloader[Customizing the Internal Bootloader]
+https://hipolitoguzman.github.io/neorv32/ug/#_customizing_the_internal_bootloader[Customizing the Internal Bootloader]
 for more information.
 
 The default NEORV32 bootloader (source code `sw/bootloader/bootloader.c`) provides a build-in firmware that
@@ -521,7 +521,7 @@ this application is also started in machine level privilege mode.
 
 [TIP]
 For detailed information on using an SPI flash for application storage see User Guide section
-https://stnolting.github.io/neorv32/ug/#_programming_an_external_spi_flash_via_the_bootloader[Programming an External SPI Flash via the Bootloader].
+https://hipolitoguzman.github.io/neorv32/ug/#_programming_an_external_spi_flash_via_the_bootloader[Programming an External SPI Flash via the Bootloader].
 
 
 :sectnums:
@@ -661,4 +661,4 @@ neorv32_rte_exception_uninstall(EXC_MTI);
 
 [TIP]
 More information regarding the NEORV32 runtime environment can be found in the doxygen
-software documentation (also available online at https://stnolting.github.io/neorv32/sw/files.html[GitHub pages]).
+software documentation (also available online at https://hipolitoguzman.github.io/neorv32/sw/files.html[GitHub pages]).

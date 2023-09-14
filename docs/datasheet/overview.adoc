@@ -20,11 +20,11 @@ of the CoreMark MCU benchmark and the official RISC-V architecture test suite. R
 default toolchain (https://github.com/stnolting/riscv-gcc-prebuilt[prebuilt toolchains are also provided]).
 
 [TIP]
-Check out the processor's **https://stnolting.github.io/neorv32/ug[online User Guide]**
+Check out the processor's **https://hipolitoguzman.github.io/neorv32/ug[online User Guide]**
 that provides hands-on tutorial to get you started.
 
 [TIP]
-The project's change log is available in https://github.com/stnolting/neorv32/blob/master/CHANGELOG.md[CHANGELOG.md]
+The project's change log is available in https://github.com/hipolitoguzman/neorv32/blob/master/CHANGELOG.md[CHANGELOG.md]
 in the root directory of the NEORV32 repository. Please also check out the <<_legal>> section.
 
 
@@ -141,7 +141,7 @@ devices. Precise exceptions allow a defined and fully-synchronized state of the 
 ** internal bootloader with serial user interface
 ** core libraries for high-level usage of the provided functions and peripherals
 ** runtime environment and several example programs
-** doxygen-based documentation of the software framework; a deployed version is available at https://stnolting.github.io/neorv32/sw/files.html
+** doxygen-based documentation of the software framework; a deployed version is available at https://hipolitoguzman.github.io/neorv32/sw/files.html
 ** FreeRTOS port + demos available
 
 [TIP]
@@ -301,7 +301,7 @@ No HPM counters and no PMP regions were implemented for generating these results
 The CPU provides further options to reduce the area footprint (for example by constraining the CPU-internal
 counter sizes) or to increase performance (for example by using a barrel-shifter; at cost of extra hardware).
 See section <<_processor_top_entity_generics>> for more information. Also, take a look at the User Guide section
-https://stnolting.github.io/neorv32/ug/#_application_specific_processor_configuration[Application-Specific Processor Configuration].
+https://hipolitoguzman.github.io/neorv32/ug/#_application_specific_processor_configuration[Application-Specific Processor Configuration].
 
 
 :sectnums:
@@ -349,7 +349,7 @@ https://stnolting.github.io/neorv32/ug/#_application_specific_processor_configur
 :sectnums:
 ==== Exemplary Setups
 
-Check out the `setups` folder (@GitHub: https://github.com/stnolting/neorv32/tree/master/setups),
+Check out the `setups` folder (@GitHub: https://github.com/hipolitoguzman/neorv32/tree/master/setups),
 which provides several demo setups for various FPGA boards and toolchains.
 
 
